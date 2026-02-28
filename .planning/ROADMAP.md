@@ -13,7 +13,7 @@ This roadmap outlines the path to building a high-performance UK property intell
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & OpenRent Sourcing | 5/5 | Complete | 2026-02-28 |
-| 2. Intelligence, Compliance & Hotspots | 0/0 | Not started | - |
+| 2. Intelligence, Compliance & Hotspots | 4/4 | Complete | 2026-02-28 |
 | 3. Portal Scaling & Lead Management | 0/0 | Not started | - |
 
 ## Phase Details
@@ -45,10 +45,10 @@ This roadmap outlines the path to building a high-performance UK property intell
   3. User can view ROI projections that automatically account for TOMS VAT logic and R2R-specific expenses.
   4. User can visualize demand layers for specific cohorts like hospital workers or tourists.
 **Plans**:
-  - [ ] 02-01: Intelligence Schemas & Advanced ROI
-  - [ ] 02-02: Compliance Ingestion & Hotspot Data
-  - [ ] 02-03: Hotspot & Compliance Visualizations
-  - [ ] 02-04: Demand Hubs & Isochrones
+  - [x] 02-01: Intelligence Schemas & Advanced ROI
+  - [x] 02-02: Compliance Ingestion & Hotspot Data
+  - [x] 02-03: Hotspot & Compliance Visualizations
+  - [x] 02-04: Demand Hubs & Isochrones
 
 ### Phase 3: Portal Scaling & Lead Management
 **Goal**: Users can source deals from multiple UK portals and manage a personal pipeline of investment leads.
