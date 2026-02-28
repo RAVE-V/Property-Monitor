@@ -69,18 +69,18 @@
 | MAP-03 | Phase 1 | Pending |
 | MAP-04 | Phase 1 | Pending |
 | DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
+| DATA-02 | Phase 3 | Pending |
+| DATA-03 | Phase 3 | Pending |
 | DATA-04 | Phase 2 | Pending |
 | CALC-01 | Phase 1 | Pending |
 | CALC-02 | Phase 2 | Pending |
 | CALC-03 | Phase 2 | Pending |
 | HOT-01 | Phase 2 | Pending |
 | HOT-02 | Phase 2 | Pending |
-| PLAN-01 | Phase 1 | Pending |
+| PLAN-01 | Phase 2 | Pending |
 | PLAN-02 | Phase 1 | Pending |
 | USER-01 | Phase 1 | Pending |
-| USER-02 | Phase 2 | Pending |
+| USER-02 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 17 total
@@ -89,4 +89,4 @@
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-02-28 after initial definition*
+*Last updated: 2026-02-28 (Traceability updated for Phase 1-3 roadmap)*
