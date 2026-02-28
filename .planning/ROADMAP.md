@@ -4,9 +4,10 @@ This roadmap outlines the path to building a high-performance UK property intell
 
 ## Phases
 
-- [ ] **Phase 1: Foundation & OpenRent Sourcing** - Establish map-based visualization and basic profit analysis using OpenRent data.
-- [ ] **Phase 2: Intelligence, Compliance & Hotspots** - Layer in SA demand data, Article 4 planning boundaries, and tax-compliant financial modeling.
-- [ ] **Phase 3: Portal Scaling & Lead Management** - Expand data ingestion to SpareRoom and Zoopla, and implement lead tracking tools.
+- [x] **Phase 1: Foundation & OpenRent Sourcing** - Establish map-based visualization and basic profit analysis using OpenRent data.
+- [x] **Phase 2: Intelligence, Compliance & Hotspots** - Layer in SA demand data, Article 4 planning boundaries, and tax-compliant financial modeling.
+- [x] **Phase 3: Portal Scaling & Lead Management** - Expand data ingestion to SpareRoom and Zoopla, and implement lead tracking tools.
+- [x] **Phase 4: Advanced Automation & DTV** - Implement distressed vendor detection, OnTheMarket ingestion, and Stannp outreach integration.
 
 ## Progress Tracking
 
@@ -14,7 +15,8 @@ This roadmap outlines the path to building a high-performance UK property intell
 |-------|----------------|--------|-----------|
 | 1. Foundation & OpenRent Sourcing | 5/5 | Complete | 2026-02-28 |
 | 2. Intelligence, Compliance & Hotspots | 4/4 | Complete | 2026-02-28 |
-| 3. Portal Scaling & Lead Management | 0/0 | Not started | - |
+| 3. Portal Scaling & Lead Management | 5/5 | Complete | 2026-02-28 |
+| 4. Advanced Automation & DTV | 4/4 | Complete | 2026-02-28 |
 
 ## Phase Details
 
@@ -58,4 +60,24 @@ This roadmap outlines the path to building a high-performance UK property intell
   1. User can see aggregated property listings from Zoopla, OnTheMarket, and SpareRoom on the same map.
   2. User can "Save for Review" promising properties and access them in a dedicated list.
   3. User can switch between a map-first view and a synchronized list view of available deals.
-**Plans**: TBD
+**Plans**:
+  - [x] 03-01: Lead Management Infrastructure
+  - [x] 03-02: Multi-Portal Ingestion (Zoopla & SpareRoom)
+  - [x] 03-03: Aggregated Data Layer (Multi-source GeoJSON)
+  - [x] 03-04: Synchronized List View (TanStack Table & Map Sync)
+  - [x] 03-05: Lead Pipeline UI & Dashboard
+
+### Phase 4: Advanced Automation & DTV
+**Goal**: Transition from intelligence gathering to automated action by identifying distressed vendors and automating physical outreach.
+**Depends on**: Phase 3
+**Requirements**: AUTO-01, AUTO-02, DATA-03, PLAN-03
+**Success Criteria**:
+  1. User can filter properties by "Tired Landlord" status (long time-on-market/price drops).
+  2. User can ingest property listings from OnTheMarket.
+  3. User can visualize C5 Use Class (Short-term Let) planning restriction layers.
+  4. User can dispatch a physical letter to a landlord via Stannp with a single click.
+**Plans**:
+  - [x] 04-01: Distressed Vendor Logic
+  - [x] 04-02: OnTheMarket Ingestion & Scaling
+  - [x] 04-03: C5 Use Class (Short-term Lets) Layers
+  - [x] 04-04: DTV Stannp Outreach Automation

@@ -1,3 +1,59 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #000000;
+  --color-brand-surface: #111111;
+  --color-brand-border: #333333;
+  --color-brand-cyan: #10b981; /* Shift cyan to WM Green */
+  --color-brand-red: #ef4444;
+  --color-brand-gold: #eab308;
+  --color-brand-text-muted: #888888;
+  --color-wm-green: #10b981;
+  --color-wm-red: #ef4444;
+  --color-wm-dark: #121212;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-white font-mono antialiased selection:bg-wm-green selection:text-black;
+    letter-spacing: 0;
+  }
+
+  /* Scanline effect */
+  body::after {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+    z-index: 9999;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    opacity: 0.3;
+  }
+}
+
+@layer components {
+  .panel-glass {
+    @apply bg-brand-surface/80 backdrop-blur-md border border-brand-border rounded-none shadow-[0_0_15px_rgba(0,0,0,0.5)];
+  }
+
+  .btn-command {
+    @apply px-4 py-2 font-mono text-[11px] font-bold tracking-wider transition-all duration-200 border border-brand-border hover:border-wm-green hover:text-wm-green hover:shadow-[0_0_10px_rgba(16,185,129,0.3)];
+  }
+
+  .input-command {
+    @apply bg-black/40 border border-brand-border px-3 py-2 text-xs focus:border-brand-cyan focus:outline-none transition-all placeholder:text-gray-600;
+  }
+
+  .label-command {
+    @apply text-[9px] font-black text-brand-text-muted uppercase tracking-[0.15em] mb-1 block;
+  }
+
+  /* Glow effects */
+  .glow-cyan { text-shadow: 0 0 8px rgba(0, 242, 255, 0.5); }
+  .glow-red { text-shadow: 0 0 8px rgba(255, 62, 62, 0.5); }
+}

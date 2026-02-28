@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { db } from '../../libs/database/db';
-import { properties, scrapingJobs } from '../../libs/database/schema';
+import { db } from '../../../libs/database/db';
+import { properties, scrapingJobs } from '../../../libs/database/schema';
 import { Queue } from 'bullmq';
 import { sql, and, gte, lte, eq } from 'drizzle-orm';
 
@@ -9,7 +9,7 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const scraperQueue = new Queue('scrapers', { connection: { url: REDIS_URL } });
 
 export async function propertyRoutes(fastify: FastifyInstance) {
-  
+
   fastify.get('/properties', async (request, reply) => {
     const querySchema = z.object({
       bbox: z.string().optional(),
@@ -21,9 +21,9 @@ export async function propertyRoutes(fastify: FastifyInstance) {
 
     const params = querySchema.parse(request.query);
     const { bbox, minPrice, maxPrice, minBedrooms, propertyType } = params;
-    
+
     const conditions = [];
-    
+
     if (bbox) {
       const [minLng, minLat, maxLng, maxLat] = bbox.split(',').map(Number);
       conditions.push(sql`location && ST_MakeEnvelope(${minLng}, ${minLat}, ${maxLng}, ${maxLat}, 4326)`);
@@ -35,7 +35,7 @@ export async function propertyRoutes(fastify: FastifyInstance) {
     if (propertyType) conditions.push(eq(properties.propertyType, propertyType));
 
     const results = await db.select().from(properties).where(and(...conditions));
-    
+
     return {
       type: 'FeatureCollection',
       features: results.map((p: any) => ({

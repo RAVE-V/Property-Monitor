@@ -7,50 +7,72 @@ interface DemandMenuProps {
   onToggleHospitals: (val: boolean) => void;
   showTourism: boolean;
   onToggleTourism: (val: boolean) => void;
+  showC5Zones: boolean;
+  onToggleC5Zones: (val: boolean) => void;
 }
 
-const DemandMenu: React.FC<DemandMenuProps> = ({ 
-  hotspotOpacity, onOpacityChange, 
+const DemandMenu: React.FC<DemandMenuProps> = ({
+  hotspotOpacity, onOpacityChange,
   showHospitals, onToggleHospitals,
-  showTourism, onToggleTourism 
+  showTourism, onToggleTourism,
+  showC5Zones, onToggleC5Zones
 }) => {
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 w-64 space-y-4">
-      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Demand Intelligence</h3>
-      
-      <div className="space-y-2">
-        <label className="text-[10px] font-bold text-gray-600 uppercase">Hotspot Opacity</label>
-        <input 
-          type="range" 
-          min="0" max="1" step="0.1" 
-          value={hotspotOpacity} 
-          onChange={(e) => onOpacityChange(parseFloat(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-        />
+    <div className="panel-glass p-0 w-[280px] bg-[#000000]/95 border border-[#333] flex flex-col shadow-2xl">
+      <div className="px-4 py-2 border-b border-[#333] flex justify-between items-center bg-[#111]">
+        <h3 className="text-[11px] font-bold text-gray-400 tracking-[0.2em] font-mono">LAYERS</h3>
+        <div className="text-gray-500 font-mono text-[10px] w-4 h-4 rounded border border-[#444] flex items-center justify-center cursor-pointer hover:bg-gray-800">?</div>
       </div>
 
-      <div className="space-y-3 pt-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Hospital Workers</span>
-          <button 
-            onClick={() => onToggleHospitals(!showHospitals)}
-            className={`w-10 h-5 rounded-full transition-colors ${showHospitals ? 'bg-blue-600' : 'bg-gray-300'}`}
-          >
-            <div className={`w-3 h-3 bg-white rounded-full transition-transform mx-1 ${showHospitals ? 'translate-x-5' : ''}`} />
-          </button>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Tourism & Landmarks</span>
-          <button 
-            onClick={() => onToggleTourism(!showTourism)}
-            className={`w-10 h-5 rounded-full transition-colors ${showTourism ? 'bg-blue-600' : 'bg-gray-300'}`}
-          >
-            <div className={`w-3 h-3 bg-white rounded-full transition-transform mx-1 ${showTourism ? 'translate-x-5' : ''}`} />
-          </button>
+      <div className="p-4 space-y-4">
+        <LayerToggle
+          label="HEALTHCARE COHORT"
+          active={showHospitals}
+          onToggle={() => onToggleHospitals(!showHospitals)}
+          icon="🏥"
+        />
+        <LayerToggle
+          label="TOURISM/LANDMARKS"
+          active={showTourism}
+          onToggle={() => onToggleTourism(!showTourism)}
+          icon="🏛️"
+        />
+        <div className="h-px bg-[#333] my-2" />
+        <LayerToggle
+          label="C5 SHORT-TERM LETS"
+          active={showC5Zones}
+          onToggle={() => onToggleC5Zones(!showC5Zones)}
+          icon="⛔"
+        />
+
+        <div className="pt-4 mt-6 border-t border-[#333]">
+          <label className="text-[10px] font-bold font-mono text-gray-500 uppercase tracking-widest mb-3 block">HOTSPOT INTENSITY</label>
+          <input
+            type="range"
+            min="0" max="1" step="0.1"
+            value={hotspotOpacity}
+            onChange={(e) => onOpacityChange(parseFloat(e.target.value))}
+            className="w-full h-1 bg-[#444] rounded-none appearance-none cursor-pointer accent-wm-green"
+          />
         </div>
       </div>
     </div>
   );
 };
+
+const LayerToggle = ({ label, active, onToggle, icon }: { label: string, active: boolean, onToggle: () => void, icon?: string }) => (
+  <div
+    className="flex items-center gap-3 cursor-pointer group"
+    onClick={onToggle}
+  >
+    <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-colors border ${active ? 'bg-wm-green border-wm-green' : 'bg-[#111] border-[#444] group-hover:border-gray-500'}`}>
+      {active && <span className="text-black text-[10px] font-bold block leading-none">✓</span>}
+    </div>
+    <div className="flex items-center gap-2">
+      {icon && <span className="text-xs">{icon}</span>}
+      <span className={`text-[12px] font-bold font-mono tracking-wide transition-colors ${active ? 'text-white/90' : 'text-gray-500 group-hover:text-gray-300'}`}>{label}</span>
+    </div>
+  </div>
+);
 
 export default DemandMenu;

@@ -1,0 +1,47 @@
+{
+  "name": "property-intel",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@tanstack/react-table": "^8.21.3",
+    "autoprefixer": "^10.4.27",
+    "big.js": "^7.0.1",
+    "bullmq": "^5.14.0",
+    "camoufox": "^0.1.19",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.33.0",
+    "fastify": "^5.0.0",
+    "lucide-react": "^0.575.0",
+    "maplibre-gl": "^5.19.0",
+    "next": "^16.1.6",
+    "pg": "^8.12.0",
+    "playwright": "^1.58.2",
+    "playwright-core": "^1.58.2",
+    "postcss": "^8.5.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/big.js": "^6.2.2",
+    "@types/node": "^22.5.4",
+    "@types/pg": "^8.11.8",
+    "@types/react": "19.2.14",
+    "drizzle-kit": "^0.24.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.9"
+  }
+}

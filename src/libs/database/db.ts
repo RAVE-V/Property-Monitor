@@ -7,6 +7,7 @@ dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  connectionTimeoutMillis: 1000,
 });
 
 export const db = drizzle(pool, { schema });
@@ -34,7 +35,7 @@ export async function checkPropertyCompliance(propertyId: string) {
   await db.update(schema.properties)
     .set({
       isArticle4,
-      article4ZoneId: zoneId,
+      article4ZoneId: zoneId as any,
     })
     .where(eq(schema.properties.id, propertyId));
 

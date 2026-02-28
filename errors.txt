@@ -1,0 +1,17 @@
+drizzle.config.ts(2,25): error TS2307: Cannot find module 'dotenv' or its corresponding type declarations.
+drizzle.config.ts(8,3): error TS2322: Type '"pg"' is not assignable to type '"d1-http"'.
+drizzle.config.ts(10,5): error TS2353: Object literal may only specify known properties, and 'connectionString' does not exist in type '{ accountId: string; databaseId: string; token: string; }'.
+src/app/components/Map.tsx(4,8): error TS2307: Cannot find module 'maplibre-gl/dist/maplibre-gl.css' or its corresponding type declarations.
+src/app/components/Map.tsx(168,25): error TS2532: Object is possibly 'undefined'.
+src/app/components/Map.tsx(180,29): error TS18047: 'map.current' is possibly 'null'.
+src/app/components/SidePanel.tsx(36,21): error TS2339: Property 'isArticle4' does not exist on type 'Property'.
+src/app/layout.tsx(1,8): error TS2307: Cannot find module './globals.css' or its corresponding type declarations.
+src/apps/api/routes/hotspots.ts(3,20): error TS2307: Cannot find module '../../libs/database/db' or its corresponding type declarations.
+src/apps/api/routes/hotspots.ts(4,45): error TS2307: Cannot find module '../../libs/database/schema' or its corresponding type declarations.
+src/apps/api/routes/properties.ts(3,20): error TS2307: Cannot find module '../../libs/database/db' or its corresponding type declarations.
+src/apps/api/routes/properties.ts(4,42): error TS2307: Cannot find module '../../libs/database/schema' or its corresponding type declarations.
+src/apps/api/server.ts(2,18): error TS2307: Cannot find module '@fastify/cors' or its corresponding type declarations.
+src/apps/api/server.ts(5,25): error TS2307: Cannot find module 'dotenv' or its corresponding type declarations.
+src/libs/database/db.ts(4,25): error TS2307: Cannot find module 'dotenv' or its corresponding type declarations.
+src/libs/scrapers/openrent.ts(1,26): error TS2307: Cannot find module 'playwright-core' or its corresponding type declarations.
+src/workers/scraper-worker.ts(4,22): error TS2305: Module '"../libs/database/schema"' has no exported member 'scrapingJobs'.

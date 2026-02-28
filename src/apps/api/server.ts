@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { propertyRoutes } from './routes/properties';
 import { hotspotRoutes } from './routes/hotspots';
+import { leadRoutes } from './routes/leads';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -14,6 +15,7 @@ server.register(cors);
 // Register routes
 server.register(propertyRoutes);
 server.register(hotspotRoutes);
+server.register(leadRoutes);
 
 const start = async () => {
   try {

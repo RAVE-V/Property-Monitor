@@ -4,24 +4,27 @@ export function useZones(bbox: [number, number, number, number] | null) {
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const bboxKey = bbox?.join(',');
+
   useEffect(() => {
-    if (!bbox) return;
+    if (!bboxKey) return;
 
     const fetchZones = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/zones?bbox=${bbox.join(',')}`);
+        const response = await fetch(`/api/zones?bbox=${bboxKey}`);
+        if (!response.ok) throw new Error('Failed to fetch zones');
         const json = await response.json();
         setData(json);
       } catch (err) {
-        console.error(err);
+        console.error('useZones error:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchZones();
-  }, [bbox]);
+  }, [bboxKey]);
 
   return { data, isLoading };
 }

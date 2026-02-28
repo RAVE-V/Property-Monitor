@@ -8,6 +8,11 @@ export interface Property {
   propertyType: string | null;
   location: { lng: number, lat: number };
   scrapedAt?: Date;
+  // Phase 4 Fields
+  firstSeenAt?: Date;
+  originalPrice?: number;
+  timeOnMarket?: number; // in days
+  isTiredLandlord?: boolean;
 }
 
 export interface ROIInput {
@@ -17,6 +22,7 @@ export interface ROIInput {
   monthlyBills: number;
   managementFees: number;
   setupCosts: number;
+  useTOMS?: boolean;
 }
 
 export interface ROIResult {
@@ -24,4 +30,6 @@ export interface ROIResult {
   monthlyProfit: number;
   annualProfit: number;
   roiPercentage: number;
+  breakEvenADR60: number;
+  tomsVAT: number;
 }

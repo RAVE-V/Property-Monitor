@@ -1,3 +1,4 @@
+// @ts-expect-error TypeScript doesn't know about CSS files
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -5,7 +6,7 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Property Intel',
+  title: 'Property Monitor',
   description: 'Rent-to-Rent Investment Intelligence',
 }
 

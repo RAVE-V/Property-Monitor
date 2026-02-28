@@ -4,24 +4,30 @@ export function useHotspots(bbox: [number, number, number, number] | null) {
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!bbox) return;
+  const bboxKey = bbox?.join(',');
 
+  useEffect(() => {
     const fetchHotspots = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/hotspots?bbox=${bbox.join(',')}`);
+        // Load all hotspots globally on init; use bbox only when available
+        const url = bboxKey
+          ? `/api/hotspots?bbox=${bboxKey}`
+          : `/api/hotspots`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch hotspots');
         const json = await response.json();
         setData(json);
       } catch (err) {
-        console.error(err);
+        console.error('useHotspots error:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchHotspots();
-  }, [bbox]);
+  }, [bboxKey]);
 
   return { data, isLoading };
 }
+
