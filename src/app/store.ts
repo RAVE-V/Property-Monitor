@@ -11,6 +11,7 @@ export interface Property {
   isArticle4?: boolean;
   saProfit?: number;
   occupancyRate?: number | null;
+  tenure?: string | null;
 }
 
 interface AppState {

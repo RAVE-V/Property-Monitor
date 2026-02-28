@@ -13,6 +13,8 @@ export interface Property {
   originalPrice?: number;
   timeOnMarket?: number; // in days
   isTiredLandlord?: boolean;
+  tenure?: string | null;
+  status?: string | null;
 }
 
 export interface ROIInput {
