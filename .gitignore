@@ -44,6 +44,21 @@ yarn-error.log*
 .claude
 .claude-flow
 .planning
+*.md
+!README.md
+!CLAUDE.md
+
+# Testing, Debugging & Root Scripts
+test_*.ts
+check*.ts
+debug*.ts
+run_*.ts
+scrape-*.ts
+seed*.ts
+fix-*.ts
+auto-refresh.ts
+migrate-status.ts
+errors.txt
 
 # Database 
 *.db
