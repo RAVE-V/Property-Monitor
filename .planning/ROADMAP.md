@@ -12,7 +12,7 @@ This roadmap outlines the path to building a high-performance UK property intell
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & OpenRent Sourcing | 0/0 | Not started | - |
+| 1. Foundation & OpenRent Sourcing | 5/5 | Complete | 2026-02-28 |
 | 2. Intelligence, Compliance & Hotspots | 0/0 | Not started | - |
 | 3. Portal Scaling & Lead Management | 0/0 | Not started | - |
 
@@ -29,11 +29,11 @@ This roadmap outlines the path to building a high-performance UK property intell
   4. User can click a property marker to see a side panel with automated profit/loss calculations.
   5. User can see basic planning status indicators for any listed property.
 **Plans**:
-  - [ ] 01-01: Infrastructure & Data Foundation
-  - [ ] 01-02: OpenRent Scraper & API
-  - [ ] 01-03: Interactive Map Visualization
-  - [ ] 01-04: Analysis Side-Panel & Profit Calculator
-  - [ ] 01-05: Map Filters & Planning Indicators
+  - [x] 01-01: Infrastructure & Data Foundation
+  - [x] 01-02: OpenRent Scraper & API
+  - [x] 01-03: Interactive Map Visualization
+  - [x] 01-04: Analysis Side-Panel & Profit Calculator
+  - [x] 01-05: Map Filters & Planning Indicators
 
 ### Phase 2: Intelligence, Compliance & Hotspots
 **Goal**: Users can identify high-profit "hotspots" and verify regulatory compliance for SA and HMO strategies.
