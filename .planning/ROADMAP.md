@@ -44,7 +44,11 @@ This roadmap outlines the path to building a high-performance UK property intell
   2. User can see Article 4 planning restriction boundaries overlaid on the map.
   3. User can view ROI projections that automatically account for TOMS VAT logic and R2R-specific expenses.
   4. User can visualize demand layers for specific cohorts like hospital workers or tourists.
-**Plans**: TBD
+**Plans**:
+  - [ ] 02-01: Intelligence Schemas & Advanced ROI
+  - [ ] 02-02: Compliance Ingestion & Hotspot Data
+  - [ ] 02-03: Hotspot & Compliance Visualizations
+  - [ ] 02-04: Demand Hubs & Isochrones
 
 ### Phase 3: Portal Scaling & Lead Management
 **Goal**: Users can source deals from multiple UK portals and manage a personal pipeline of investment leads.
