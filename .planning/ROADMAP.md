@@ -28,7 +28,12 @@ This roadmap outlines the path to building a high-performance UK property intell
   3. User can filter the map by price, bedrooms, and property type with instant marker updates.
   4. User can click a property marker to see a side panel with automated profit/loss calculations.
   5. User can see basic planning status indicators for any listed property.
-**Plans**: TBD
+**Plans**:
+  - [ ] 01-01: Infrastructure & Data Foundation
+  - [ ] 01-02: OpenRent Scraper & API
+  - [ ] 01-03: Interactive Map Visualization
+  - [ ] 01-04: Analysis Side-Panel & Profit Calculator
+  - [ ] 01-05: Map Filters & Planning Indicators
 
 ### Phase 2: Intelligence, Compliance & Hotspots
 **Goal**: Users can identify high-profit "hotspots" and verify regulatory compliance for SA and HMO strategies.
