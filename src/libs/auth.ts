@@ -11,6 +11,7 @@ import { db } from './database/db';
 import { users, accounts, sessions, verificationTokens } from './database/schema';
 
 const config = {
+    secret: process.env.AUTH_SECRET || 'dbe111a5642406b75541ea1d02c1696dbad7be83bb992fba159ab2e5f7dc6074',
     adapter: DrizzleAdapter(db, {
         usersTable: users as any,
         accountsTable: accounts as any,
