@@ -174,8 +174,9 @@ async function scrapeOTMCity(city: string, defaultLng: number, defaultLat: numbe
         await page.waitForTimeout(3000);
         // Try multiple possible selectors for card containers
         const selectorFound = await Promise.race([
+            page.waitForSelector('li.otm-PropertyCard', { timeout: 8000 }).then(() => 'li.otm-PropertyCard'),
+            page.waitForSelector('[data-testid="property-card"]', { timeout: 8000 }).then(() => '[data-testid="property-card"]'),
             page.waitForSelector('[data-testid="result-card"]', { timeout: 8000 }).then(() => '[data-testid="result-card"]'),
-            page.waitForSelector('[data-testid="listing-card"]', { timeout: 8000 }).then(() => '[data-testid="listing-card"]'),
             page.waitForSelector('.property-result', { timeout: 8000 }).then(() => '.property-result'),
             page.waitForSelector('li[class*="result"]', { timeout: 8000 }).then(() => 'li[class*="result"]'),
             page.waitForSelector('article', { timeout: 8000 }).then(() => 'article'),
@@ -290,6 +291,79 @@ async function scrapeSpareRoomCity(city: string, defaultLng: number, defaultLat:
     return results;
 }
 
+// ─── Zoopla ───────────────────────────────────────────────────────────────────
+async function scrapeZooplaCity(city: string, defaultLng: number, defaultLat: number): Promise<Listing[]> {
+    const browser = await chromium.launch({ headless: true });
+    const ctx = await browser.newContext({
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    });
+    const page = await ctx.newPage();
+    const results: Listing[] = [];
+
+    try {
+        await page.goto(`https://www.zoopla.co.uk/to-rent/property/${encodeURIComponent(city)}/`, {
+            waitUntil: 'domcontentloaded', timeout: 30000,
+        });
+        await page.waitForTimeout(3000);
+
+        const selectorFound = await Promise.race([
+            page.waitForSelector('[data-testid="search-result"]', { timeout: 8000 }).then(() => '[data-testid="search-result"]'),
+            page.waitForSelector('div[id^="listing_"]', { timeout: 8000 }).then(() => 'div[id^="listing_"]'),
+            new Promise<string>(resolve => setTimeout(() => resolve(''), 9000)),
+        ]);
+
+        if (!selectorFound) {
+            console.warn(`  [Zoopla] ${city}: No listing selectors found, skipping`);
+            await browser.close();
+            return results;
+        }
+
+        const raw = await page.evaluate((sel) => {
+            const cards = document.querySelectorAll(sel);
+            const out: any[] = [];
+            cards.forEach(card => {
+                const link = card.querySelector('a[href*="/to-rent/details/"]') as HTMLAnchorElement | null;
+                if (!link) return;
+                const href = link.href;
+                const idMatch = href.match(/\/details\/(\d+)/) || card.id?.match(/listing_(\d+)/);
+                const id = idMatch ? idMatch[1] : '';
+
+                const priceEl = card.querySelector('[data-testid="listing-price"], .listing-results-price');
+                const priceText = priceEl?.textContent?.trim() || '';
+
+                const titleEl = card.querySelector('[data-testid="listing-title"], h2');
+                const title = titleEl?.textContent?.trim() || '';
+
+                out.push({ id, href, priceText, title, innerText: (card as HTMLElement).innerText });
+            });
+            return out;
+        }, selectorFound);
+
+        for (const item of raw.slice(0, 30)) {
+            if (!item.id || !item.priceText) continue;
+            const price = extractPCM(item.priceText, item.innerText);
+            if (!price) continue;
+            const postcode = extractPostcode(item.title + ' ' + item.innerText);
+
+            const bedMatch = item.title.match(/(\d+)\s*[Bb]ed/i);
+            const beds = bedMatch ? parseInt(bedMatch[1]!) : (item.title.toLowerCase().includes('studio') ? 0 : 1);
+
+            const typeMatch = item.title.match(/\d+\s*[Bb]ed\s+(\w+)/i) || item.title.match(/^(Studio|Flat|House|Apartment|Room)/i);
+            const propertyType = typeMatch ? typeMatch[1]! : 'Property';
+
+            let lat = defaultLat, lng = defaultLng;
+            if (postcode) { const geo = await geocode(postcode); if (geo) { lat = geo.lat; lng = geo.lng; } }
+            results.push({
+                portalId: `zoopla-${item.id}`, url: item.href,
+                source: 'zoopla', title: item.title || `Zoopla Property, ${city}`,
+                price, bedrooms: beds, propertyType, postcode: postcode || null, lat, lng,
+            });
+        }
+    } catch (err: any) { console.warn(`  [Zoopla] ${city} error:`, err.message?.split('\n')[0]); }
+    finally { await browser.close(); }
+    return results;
+}
+
 // ─── Upsert to DB ─────────────────────────────────────────────────────────────
 async function upsert(listing: Listing): Promise<boolean> {
     try {
@@ -313,11 +387,12 @@ async function upsert(listing: Listing): Promise<boolean> {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 async function run() {
-    console.log('\n🏠 Multi-Source Property Scraper (OpenRent + OnTheMarket + SpareRoom)\n');
+    console.log('\n🏠 Multi-Source Property Scraper (OpenRent + OnTheMarket + SpareRoom + Zoopla)\n');
     const sources = [
         { name: 'OpenRent', fn: scrapeOpenRentCity },
         { name: 'OnTheMarket', fn: scrapeOTMCity },
         { name: 'SpareRoom', fn: scrapeSpareRoomCity },
+        { name: 'Zoopla', fn: scrapeZooplaCity },
     ];
 
     let total = 0;
