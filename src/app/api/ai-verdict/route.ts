@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '../../../libs/database/db.js';
-import { properties } from '../../../libs/database/schema.js';
+import { db } from '../../../libs/database/db';
+import { properties } from '../../../libs/database/schema';
 import { eq } from 'drizzle-orm';
 
 // Simple in-memory cache to avoid repeated LLM calls for same property (fast-path)
