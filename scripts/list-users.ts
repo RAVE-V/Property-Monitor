@@ -10,6 +10,7 @@ async function listUsers() {
             id: users.id,
             name: users.name,
             email: users.email,
+            lastIp: users.lastIp,
             provider: accounts.provider,
             lastVerified: users.emailVerified,
         })
@@ -23,6 +24,7 @@ async function listUsers() {
                 Name: u.name || 'N/A',
                 Email: u.email,
                 Provider: u.provider || 'N/A',
+                IP: u.lastIp || 'N/A',
                 Verified: u.lastVerified ? u.lastVerified.toISOString().split('T')[0] : 'N/A'
             })));
         } else {

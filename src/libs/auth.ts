@@ -9,6 +9,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { db } from './database/db';
 import { users, accounts, sessions, verificationTokens } from './database/schema';
+import { eq } from 'drizzle-orm';
 
 const config = {
     secret: process.env.AUTH_SECRET || 'dbe111a5642406b75541ea1d02c1696dbad7be83bb992fba159ab2e5f7dc6074',
@@ -39,6 +40,27 @@ const config = {
         error: '/auth/signin',
     },
     callbacks: {
+        async signIn({ user, profile, account, email, credentials }) {
+            // Update last IP address on sign in if we have a user ID and can find the IP
+            if (user?.id) {
+                try {
+                    // In Next.js middleware/server actions, we'd normally use headers()
+                    // Auth.js doesn't pass the raw request here, so we rely on the adapter 
+                    // or a separate middleware hit to populate this if possible.
+                    // However, we can use a trick to try and find the request via the environment in Node.
+                    const { headers } = await import('next/headers');
+                    const headerList = await headers();
+                    const ip = headerList.get('x-forwarded-for') || '127.0.0.1';
+
+                    await db.update(users as any)
+                        .set({ lastIp: ip })
+                        .where(eq(users.id, user.id));
+                } catch (e) {
+                    console.error('Failed to update user IP:', e);
+                }
+            }
+            return true;
+        },
         async jwt({ token, user }: { token: any; user: any }) {
             if (user) {
                 token.id = user.id;

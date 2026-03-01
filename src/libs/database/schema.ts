@@ -70,6 +70,7 @@ export const users = pgTable('users', {
   email: text('email').notNull().unique(),
   emailVerified: timestamp('email_verified', { mode: 'date' }),
   image: text('image'),
+  lastIp: text('last_ip'),
 });
 
 export const accounts = pgTable('accounts', {
