@@ -21,6 +21,7 @@ export default function Home() {
   const setSelectedPropertyId = useAppStore(state => state.setSelectedPropertyId);
   const isListViewOpen = useAppStore(state => state.isListViewOpen);
   const toggleListView = useAppStore(state => state.toggleListView);
+  const setListViewOpen = useAppStore(state => state.setListViewOpen);
   const filters = useAppStore(state => state.filters);
   const setFilters = useAppStore(state => state.setFilters);
   const setProperties = useAppStore(state => state.setProperties);
@@ -225,6 +226,7 @@ export default function Home() {
           <Map
             onBoundsChange={setBbox}
             onMarkerClick={setSelectedPropertyId}
+            onClusterClick={() => setListViewOpen(true)}
             propertiesGeoJSON={filteredGeoJSON}
             hotspotsGeoJSON={hotspotsGeoJSON}
             zonesGeoJSON={zonesGeoJSON}

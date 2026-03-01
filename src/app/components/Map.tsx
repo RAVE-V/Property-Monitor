@@ -8,6 +8,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 interface MapProps {
   onBoundsChange: (bbox: [number, number, number, number]) => void;
   onMarkerClick: (propertyId: string) => void;
+  onClusterClick?: () => void;
   propertiesGeoJSON: any;
   hotspotsGeoJSON?: any;
   zonesGeoJSON?: any;
@@ -19,7 +20,7 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({
-  onBoundsChange, onMarkerClick, propertiesGeoJSON,
+  onBoundsChange, onMarkerClick, onClusterClick, propertiesGeoJSON,
   hotspotsGeoJSON, zonesGeoJSON, hubsGeoJSON,
   isochroneGeoJSON, hotspotOpacity = 0.7, showC5Zones = false,
   selectedProperty
@@ -315,7 +316,35 @@ const Map: React.FC<MapProps> = ({
         if (map.current) map.current.getCanvas().style.cursor = '';
       });
 
-      // Events
+      // Events — Cluster click: zoom into cluster and trigger telemetry
+      map.current!.on('click', 'clusters', (e) => {
+        const features = map.current?.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        if (!features || features.length === 0) return;
+        const clusterId = features[0].properties?.cluster_id;
+        const source = map.current?.getSource('properties') as maplibregl.GeoJSONSource;
+        if (source && clusterId !== undefined) {
+          source.getClusterExpansionZoom(clusterId).then((zoom: number) => {
+            const coords = (features[0].geometry as any).coordinates;
+            map.current?.flyTo({
+              center: coords,
+              zoom: Math.min(zoom, 15),
+              duration: 1200,
+              essential: true
+            });
+            // Notify parent to open telemetry
+            if (onClusterClick) onClusterClick();
+          });
+        }
+      });
+
+      // Cursor for clusters
+      map.current!.on('mouseenter', 'clusters', () => {
+        if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current!.on('mouseleave', 'clusters', () => {
+        if (map.current) map.current.getCanvas().style.cursor = '';
+      });
+
       map.current!.on('click', 'unclustered-point', (e) => {
         const features = map.current?.queryRenderedFeatures(e.point, { layers: ['unclustered-point'] });
         if (features && features.length > 0 && features[0].properties) {

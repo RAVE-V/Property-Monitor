@@ -75,7 +75,7 @@ function extractPostcode(text: string): string {
  *  - "£1,200 pcm" => 1200
  *  - "£300 pw" => 1300 (×52/12)
  *  - "£300 per week" => 1300
- *  - "£1200" => 1200 (assumed pcm if >= 300, else treated as pw)
+ *  - "£1200" => 1200 (assumed pcm if >= 500, else treated as pw)
  */
 function extractPCM(priceText: string, fullText = ''): number {
     const combined = (priceText + ' ' + fullText).toLowerCase();
@@ -87,13 +87,14 @@ function extractPCM(priceText: string, fullText = ''): number {
     const rawPrice = nums.find(n => n >= 100 && n <= 10000) ?? nums[0] ?? 0;
     if (!rawPrice) return 0;
 
-    const isPW = /\bpw\b|per\s*week|weekly/i.test(combined);
-    const isPCM = /\bpcm\b|per\s*month|monthly/i.test(combined);
+    const isPW = /\bpw\b|per\s*week|per\s*wk|weekly|\/\s*week|p\.w\./i.test(combined);
+    const isPCM = /\bpcm\b|per\s*month|per\s*calendar|monthly|\/\s*month|p\.c\.m\./i.test(combined);
 
     if (isPW) return Math.round((rawPrice * 52) / 12);
     if (isPCM) return rawPrice;
-    // Heuristic: weekly rents are usually < 700 in the UK
-    if (rawPrice < 700 && !isPCM) return Math.round((rawPrice * 52) / 12);
+    // Heuristic: if no explicit indicator and price < 500, it's almost certainly weekly
+    // UK monthly rents below £500 are extremely rare even for rooms
+    if (rawPrice < 500) return Math.round((rawPrice * 52) / 12);
     return rawPrice;
 }
 
@@ -107,7 +108,7 @@ async function scrapeOpenRentCity(city: string, defaultLng: number, defaultLat: 
     const results: Listing[] = [];
 
     try {
-        await page.goto(`https://www.openrent.co.uk/properties-to-rent/?term=${encodeURIComponent(city)}&min_beds=1&max_beds=8&min_price=500&max_price=5000`, {
+        await page.goto(`https://www.openrent.co.uk/properties-to-rent/?term=${encodeURIComponent(city)}&min_beds=1&max_beds=8`, {
             waitUntil: 'networkidle', timeout: 45000,
         });
         await page.waitForSelector('a.pli', { timeout: 10000 });
@@ -130,7 +131,7 @@ async function scrapeOpenRentCity(city: string, defaultLng: number, defaultLat: 
 
         for (const item of raw.slice(0, 40)) {
             const price = extractPCM(item.priceText, item.innerText);
-            if (!price) continue;
+            if (!price || price < 400 || price > 8000) continue;  // Skip unreasonable PCM values
             const lines = item.innerText.split('\n').map((l: string) => l.trim()).filter(Boolean);
             let title = '';
             for (const line of lines) {
@@ -160,45 +161,61 @@ async function scrapeOpenRentCity(city: string, defaultLng: number, defaultLat: 
 async function scrapeOTMCity(city: string, defaultLng: number, defaultLat: number): Promise<Listing[]> {
     const browser = await chromium.launch({ headless: true });
     const ctx = await browser.newContext({
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
     });
     const page = await ctx.newPage();
     const results: Listing[] = [];
 
     try {
         await page.goto(`https://www.onthemarket.com/to-rent/property/${encodeURIComponent(city)}/`, {
-            waitUntil: 'networkidle', timeout: 45000,
+            waitUntil: 'domcontentloaded', timeout: 30000,
         });
-        await page.waitForSelector('[data-testid="listing-card"], .listing-card, article', { timeout: 12000 });
+        // Wait a bit for JS rendering
+        await page.waitForTimeout(3000);
+        // Try multiple possible selectors for card containers
+        const selectorFound = await Promise.race([
+            page.waitForSelector('[data-testid="result-card"]', { timeout: 8000 }).then(() => '[data-testid="result-card"]'),
+            page.waitForSelector('[data-testid="listing-card"]', { timeout: 8000 }).then(() => '[data-testid="listing-card"]'),
+            page.waitForSelector('.property-result', { timeout: 8000 }).then(() => '.property-result'),
+            page.waitForSelector('li[class*="result"]', { timeout: 8000 }).then(() => 'li[class*="result"]'),
+            page.waitForSelector('article', { timeout: 8000 }).then(() => 'article'),
+            new Promise<string>(resolve => setTimeout(() => resolve(''), 9000)),
+        ]);
 
-        const raw = await page.evaluate(() => {
-            const cards = document.querySelectorAll('[data-testid="listing-card"], article.result, li.result');
+        if (!selectorFound) {
+            console.warn(`  [OnTheMarket] ${city}: No listing selectors found, skipping`);
+            await browser.close();
+            return results;
+        }
+
+        const raw = await page.evaluate((sel) => {
+            const cards = document.querySelectorAll(sel);
             const out: any[] = [];
             cards.forEach(card => {
-                const link = card.querySelector('a[href*="/property/"]') as HTMLAnchorElement | null;
+                const link = (card.querySelector('a[href*="/details/"], a[href*="/property/"]') || card.querySelector('a')) as HTMLAnchorElement | null;
                 if (!link) return;
                 const href = link.href;
-                const idMatch = href.match(/\/property\/(?:to-rent\/)?([^/?]+)/);
+                const idMatch = href.match(/\/(?:details|property)\/(?:to-rent\/)?([^/?#]+)/);
                 const id = idMatch ? idMatch[1] : '';
-                // Price
-                const priceEl = card.querySelector('[class*="price"], [data-testid="price"]');
+                // Price — try multiple selectors
+                const priceEl = card.querySelector('[class*="price"], [data-testid*="price"], span[class*="Price"]');
                 const priceText = priceEl?.textContent?.trim() || '';
                 // Title / address
-                const titleEl = card.querySelector('h2, h3, [class*="address"], [class*="title"], [data-testid="address"]');
+                const titleEl = card.querySelector('h2, h3, [class*="address"], [class*="title"], [data-testid*="address"], address');
                 const title = titleEl?.textContent?.trim() || '';
                 // Beds
-                const bedsEl = card.querySelector('[class*="bed"], [data-testid="beds"]');
+                const bedsEl = card.querySelector('[class*="bed"], [data-testid*="bed"], span[class*="Bed"]');
                 const bedsText = bedsEl?.textContent?.trim() || '';
                 out.push({ id, href, priceText, title, bedsText, innerText: (card as HTMLElement).innerText });
             });
             return out;
-        });
+        }, selectorFound);
 
-        console.log(`  [OnTheMarket] ${city}: ${raw.length} raw cards`);
+        console.log(`  [OnTheMarket] ${city}: ${raw.length} raw cards (selector: ${selectorFound})`);
 
         for (const item of raw.slice(0, 30)) {
             const price = extractPCM(item.priceText, item.innerText);
-            if (!price || !item.title) continue;
+            if (!price || price < 400 || price > 8000 || !item.title) continue;
             const postcode = extractPostcode(item.title + ' ' + item.innerText);
             const bedMatch = (item.bedsText + item.title).match(/(\d+)\s*[Bb]ed/);
             const beds = bedMatch ? parseInt(bedMatch[1]!) : 1;
@@ -213,7 +230,9 @@ async function scrapeOTMCity(city: string, defaultLng: number, defaultLat: numbe
                 postcode: postcode || null, lat, lng,
             });
         }
-    } catch (err) { console.error(`  [OTM] ${city} error:`, err); }
+    } catch (err: any) {
+        console.warn(`  [OTM] ${city}: scraper failed (${err.message?.split('\n')[0] || err}), skipping gracefully`);
+    }
     finally { await browser.close(); }
     return results;
 }
