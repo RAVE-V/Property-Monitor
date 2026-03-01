@@ -16,6 +16,21 @@ const CITIES = [
     { city: 'birmingham', label: 'Birmingham', defaultLng: -1.8904, defaultLat: 52.4862 },
     { city: 'leeds', label: 'Leeds', defaultLng: -1.5491, defaultLat: 53.8008 },
     { city: 'bristol', label: 'Bristol', defaultLng: -2.5879, defaultLat: 51.4545 },
+    // Scotland
+    { city: 'edinburgh', label: 'Edinburgh', defaultLng: -3.1883, defaultLat: 55.9533 },
+    { city: 'glasgow', label: 'Glasgow', defaultLng: -4.2518, defaultLat: 55.8642 },
+    { city: 'aberdeen', label: 'Aberdeen', defaultLng: -2.0943, defaultLat: 57.1497 },
+    { city: 'dundee', label: 'Dundee', defaultLng: -2.9707, defaultLat: 56.4620 },
+    // North England
+    { city: 'newcastle', label: 'Newcastle', defaultLng: -1.6178, defaultLat: 54.9783 },
+    { city: 'sheffield', label: 'Sheffield', defaultLng: -1.4701, defaultLat: 53.3811 },
+    { city: 'liverpool', label: 'Liverpool', defaultLng: -2.9916, defaultLat: 53.4084 },
+    // Midlands / East
+    { city: 'nottingham', label: 'Nottingham', defaultLng: -1.1581, defaultLat: 52.9548 },
+    // Wales
+    { city: 'cardiff', label: 'Cardiff', defaultLng: -3.1791, defaultLat: 51.4816 },
+    // Northern Ireland
+    { city: 'belfast', label: 'Belfast', defaultLng: -5.9301, defaultLat: 54.5973 },
 ];
 
 interface Listing {

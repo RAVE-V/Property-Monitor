@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+// Simple in-memory cache to avoid repeated LLM calls for same property
+const verdictCache = new Map<string, string>();
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const {
+            id, title, price, bedrooms, propertyType, source,
+            monthlyProfit, income, occupancyRate, isArticle4,
+            isTiredLandlord, priceDropPercent, timeOnMarket,
+            roiPercentage, breakEvenADR
+        } = body;
+
+        // Return cached verdict if available
+        if (id && verdictCache.has(id)) {
+            return NextResponse.json({ verdict: verdictCache.get(id) });
+        }
+
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) {
+            return NextResponse.json({ verdict: null, error: 'No GROQ_API_KEY set' }, { status: 500 });
+        }
+
+        const systemPrompt = `You are a UK property investment analyst specialising in Serviced Accommodation (SA), Rent-to-Rent (R2R), and HMO strategies. You provide concise, actionable expert verdicts on rental properties.
+
+Your verdict must be 2-3 sentences maximum. Be direct, use specific financial language, and focus on what a professional investor would care about. Never use generic filler phrases.
+
+Think about:
+- Is the profit margin viable for SA/R2R?
+- Does local Airbnb demand support short-term let income?
+- Are there planning, legal, or negotiation angles the investor should know?
+- What is the optimal exit strategy for this specific asset?`;
+
+        const userPrompt = `Analyse this UK rental property and give an expert investment verdict:
+
+Property: ${title || 'Unknown'}
+Type: ${propertyType || 'Unknown'} | Bedrooms: ${bedrooms ?? 'Unknown'} | Source: ${source}
+Monthly Rent: £${price?.toLocaleString() ?? 'Unknown'}
+Estimated SA Monthly Income: £${income?.toLocaleString() ?? 'Unknown'}
+Projected Monthly Profit: £${monthlyProfit?.toLocaleString() ?? 'Unknown'}
+ROI: ${roiPercentage ?? 'Unknown'}% | Break-even ADR: £${breakEvenADR ?? 'Unknown'}/night
+Local Airbnb Occupancy: ${occupancyRate != null ? `${occupancyRate}%` : 'Unknown (no local data)'}
+Article 4 Zone: ${isArticle4 ? 'YES — planning restrictions apply' : 'No'}
+Motivated/Tired Landlord: ${isTiredLandlord ? 'YES' : 'No'}
+Price Drop: ${priceDropPercent ? `${priceDropPercent}% reduction` : 'None'}
+Time on Market: ${timeOnMarket > 0 ? `${timeOnMarket} days` : 'New listing'}
+
+Give your expert verdict now:`;
+
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: 'llama-3.3-70b-versatile',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                max_tokens: 200,
+                temperature: 0.6,
+            }),
+        });
+
+        if (!response.ok) {
+            const err = await response.text();
+            console.error('Groq API error:', err);
+            return NextResponse.json({ verdict: null, error: 'Groq API error' }, { status: 502 });
+        }
+
+        const data = await response.json() as any;
+        const verdict = data.choices?.[0]?.message?.content?.trim() ?? null;
+
+        // Cache it
+        if (id && verdict) {
+            verdictCache.set(id, verdict);
+            // Evict old entries if cache grows too large
+            if (verdictCache.size > 500) {
+                const firstKey = verdictCache.keys().next().value;
+                if (firstKey) verdictCache.delete(firstKey);
+            }
+        }
+
+        return NextResponse.json({ verdict });
+    } catch (err) {
+        console.error('AI verdict error:', err);
+        return NextResponse.json({ verdict: null, error: 'Internal error' }, { status: 500 });
+    }
+}

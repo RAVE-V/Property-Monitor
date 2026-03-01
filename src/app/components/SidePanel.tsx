@@ -69,6 +69,8 @@ const SidePanel: React.FC<SidePanelProps> = ({ property, onClose }) => {
   const [notes, setNotes] = useState<string>(existingLead?.notes || '');
   const [imgError, setImgError] = useState(false);
   const [occupancy, setOccupancy] = useState<{ avgOccupancy: number | null; tier: string; tierColour: string; nearbyPoints: any[] } | null>(null);
+  const [llmVerdict, setLlmVerdict] = useState<string | null>(null);
+  const [llmLoading, setLlmLoading] = useState(false);
 
   useEffect(() => {
     if (existingLead) setNotes(existingLead.notes || '');
@@ -82,6 +84,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ property, onClose }) => {
     setIncome(defaultIncome);
     setImgError(false);
     setOccupancy(null);
+    setLlmVerdict(null);
 
     // Fetch Airbnb occupancy if we have coordinates
     const lat = property.lat ?? property.location?.lat;
@@ -93,6 +96,37 @@ const SidePanel: React.FC<SidePanelProps> = ({ property, onClose }) => {
         .catch(() => { });
     }
   }, [property.id, property.price, defaultIncome]);
+
+  // Fetch LLM verdict when ROI results are ready
+  useEffect(() => {
+    if (!property.id) return;
+    setLlmLoading(true);
+    fetch('/api/ai-verdict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: property.id,
+        title: property.title,
+        price: property.price,
+        bedrooms: property.bedrooms,
+        propertyType: property.propertyType,
+        source: property.source,
+        monthlyProfit: roiResult.monthlyProfit,
+        income,
+        occupancyRate: occupancy?.avgOccupancy ?? null,
+        isArticle4: property.isArticle4,
+        isTiredLandlord: property.isTiredLandlord,
+        priceDropPercent,
+        timeOnMarket: property.timeOnMarket,
+        roiPercentage: roiResult.roiPercentage,
+        breakEvenADR: roiResult.breakEvenADR60,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => { if (data.verdict) setLlmVerdict(data.verdict); })
+      .catch(() => { })
+      .finally(() => setLlmLoading(false));
+  }, [property.id]);
 
   const roiResult = useMemo(() => {
     return calculateROI({
@@ -236,9 +270,15 @@ const SidePanel: React.FC<SidePanelProps> = ({ property, onClose }) => {
             <span className="text-[9px] text-brand-cyan animate-pulse">✦</span>
           </div>
           <h3 className="text-[11px] font-black text-brand-cyan uppercase tracking-widest">AI Expert Verdict</h3>
+          {llmVerdict && !llmLoading && (
+            <span className="ml-auto text-[8px] font-black text-brand-cyan/60 border border-brand-cyan/20 px-1.5 py-0.5 uppercase tracking-widest">✦ Groq AI</span>
+          )}
+          {llmLoading && (
+            <span className="ml-auto text-[8px] font-black text-gray-600 uppercase tracking-widest animate-pulse">Analysing...</span>
+          )}
         </div>
-        <p className="text-[12px] text-gray-300 leading-relaxed relative z-10 italic">
-          "{aiOpinion}"
+        <p className="text-[12px] text-gray-300 leading-relaxed relative z-10 italic transition-all duration-500">
+          "{llmVerdict || aiOpinion}"
         </p>
       </div>
 
