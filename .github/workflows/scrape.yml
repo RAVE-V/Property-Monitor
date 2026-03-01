@@ -30,7 +30,9 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Push Database Schema
-        run: npm run db:push
+        run: |
+          npx drizzle-kit generate
+          npx drizzle-kit migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
