@@ -111,6 +111,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ property, onClose }) => {
         bedrooms: property.bedrooms,
         propertyType: property.propertyType,
         source: property.source,
+        url: property.url,
         monthlyProfit: roiResult.monthlyProfit,
         income,
         occupancyRate: occupancy?.avgOccupancy ?? null,

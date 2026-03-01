@@ -26,6 +26,7 @@ export const properties = pgTable('properties', {
   isArticle4: boolean('is_article4').default(false),
   article4ZoneId: uuid('article4_zone_id').references(() => article4Zones.id),
   source: text('source').default('unknown'),
+  description: text('description'),
   status: text('status').default('active'), // active | stale | sold
   tenure: text('tenure').default('rent'), // rent | sale
   aiVerdict: text('ai_verdict'),
