@@ -5,6 +5,7 @@
 import type { NextAuthConfig } from 'next-auth';
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
+import Credentials from 'next-auth/providers/credentials';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { db } from './database/db';
 import { users, accounts, sessions, verificationTokens } from './database/schema';
@@ -18,9 +19,16 @@ const config = {
     }),
     providers: [
         Google({
-            clientId: process.env.AUTH_GOOGLE_ID!,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+            clientId: process.env.AUTH_GOOGLE_ID || 'dummy_client_id',
+            clientSecret: process.env.AUTH_GOOGLE_SECRET || 'dummy_client_secret',
         }),
+        Credentials({
+            name: 'Development Mode',
+            credentials: {},
+            async authorize() {
+                return { id: 'admin-1', name: 'Admin', email: 'admin@propertyintel.com' };
+            }
+        })
     ],
     pages: {
         signIn: '/auth/signin',

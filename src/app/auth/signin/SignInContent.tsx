@@ -109,6 +109,19 @@ export default function SignInContent() {
                             </svg>
                         </button>
 
+                        <button
+                            onClick={() => signIn('credentials', { callbackUrl })}
+                            className="group flex items-center gap-3 w-full bg-[#111] hover:bg-[#161616] border border-[#222] hover:border-[#444] px-4 py-3 transition-all duration-200"
+                        >
+                            <svg className="w-4 h-4 flex-shrink-0 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                            <span className="text-[11px] font-black tracking-widest text-[#10b981] uppercase mt-0.5">Development Login (Bypass)</span>
+                            <svg className="w-3 h-3 text-gray-600 ml-auto group-hover:text-[#10b981] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-[#1a1a1a]">
