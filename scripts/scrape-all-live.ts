@@ -266,14 +266,19 @@ async function run() {
         console.log(`\n══ ${source.name} ══`);
         for (const target of CITIES) {
             console.log(`\n📍 ${target.label}...`);
-            const listings = await source.fn(target.city, target.defaultLng, target.defaultLat);
-            console.log(`  Parsed ${listings.length} listings`);
-            for (const l of listings) {
-                const ok = await upsert(l);
-                if (ok) {
-                    console.log(`  ✓ [${l.source}] ${l.title} — £${l.price.toLocaleString()}/mo (${l.postcode ?? 'city'})`);
-                    total++;
+            try {
+                const listings = await source.fn(target.city, target.defaultLng, target.defaultLat);
+                console.log(`  Parsed ${listings.length} listings`);
+                for (const l of listings) {
+                    const ok = await upsert(l);
+                    if (ok) {
+                        console.log(`  ✓ [${l.source}] ${l.title} — £${l.price.toLocaleString()}/mo (${l.postcode ?? 'city'})`);
+                        total++;
+                    }
                 }
+            } catch (err: any) {
+                console.error(`  [${source.name}] Fatal error for ${target.label}:`, err.message || err);
+                console.log(`  Skipping ${target.label} and continuing...`);
             }
         }
     }

@@ -41,7 +41,6 @@ const Map: React.FC<MapProps> = ({
     });
 
     map.current.on('load', () => {
-      setMapLoaded(true);
       // Sources
       map.current!.addSource('properties', {
         type: 'geojson',

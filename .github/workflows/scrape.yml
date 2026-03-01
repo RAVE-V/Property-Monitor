@@ -24,6 +24,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
+      - name: Push Database Schema
+        run: npm run db:push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Run Scraper
         run: npx tsx scripts/scrape-all-live.ts
         env:
