@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useLeads } from '../hooks/useLeads';
+import { useLeads } from '../../hooks/useLeads';
 
 const COLUMNS = ['New', 'Evaluating', 'Pursuing', 'Rejected', 'Sold'];
 

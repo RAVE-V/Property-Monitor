@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { calculateROI, DEFAULT_ASSUMPTIONS } from '../../libs/shared/roi';
-import { Property } from '../../libs/shared/types';
+import { calculateROI, DEFAULT_ASSUMPTIONS } from '../libs/shared/roi';
+import { Property } from '../libs/shared/types';
 import { useLeads } from '../hooks/useLeads';
 
 interface SidePanelProps {
