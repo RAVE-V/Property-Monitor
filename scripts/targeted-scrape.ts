@@ -2,7 +2,7 @@ import { chromium } from 'playwright-core';
 import { db } from '../src/libs/database/db.js';
 import { properties } from '../src/libs/database/schema.js';
 import { sql } from 'drizzle-orm';
-import fetch from 'node-fetch'; // Polyfill if needed
+
 
 // Just re-implementing briefly to trace where it fails
 

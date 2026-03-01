@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from './libs/auth';
+import { getToken } from 'next-auth/jwt';
 
 export async function proxy(req: NextRequest) {
-    const session = await (auth as any)();
-
     const { pathname } = req.nextUrl;
 
     // Allow auth routes, static files, and API auth routes through always
@@ -17,8 +15,11 @@ export async function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
+    // Check for a valid JWT token (works with both Google and Credentials providers)
+    const token = await getToken({ req, secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? '' });
+
     // Protect all other routes — redirect to sign-in with callback URL
-    if (!session) {
+    if (!token) {
         const redirectUrl = new URL('/auth/signin', req.nextUrl.origin);
         redirectUrl.searchParams.set('callbackUrl', req.nextUrl.href);
         return NextResponse.redirect(redirectUrl);

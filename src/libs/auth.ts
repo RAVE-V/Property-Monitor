@@ -26,18 +26,29 @@ const config = {
             name: 'Development Mode',
             credentials: {},
             async authorize() {
-                return { id: 'admin-1', name: 'Admin', email: 'admin@propertyintel.com' };
+                return { id: 'dev-admin', name: 'Admin', email: 'admin@propertyintel.com' };
             }
         })
     ],
+    session: {
+        strategy: 'jwt',
+    },
     pages: {
         signIn: '/auth/signin',
         error: '/auth/signin',
     },
     callbacks: {
-        session({ session, user }: { session: any; user: any }) {
-            if (session.user && user) {
-                session.user.id = user.id;
+        async jwt({ token, user }: { token: any; user: any }) {
+            if (user) {
+                token.id = user.id;
+                token.name = user.name;
+                token.email = user.email;
+            }
+            return token;
+        },
+        async session({ session, token }: { session: any; token: any }) {
+            if (session.user) {
+                session.user.id = token.id as string;
             }
             return session;
         },
