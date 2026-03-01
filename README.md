@@ -65,6 +65,25 @@ Property Monitor is a highly optimized, automated real estate investment and ana
    ```
    Navigate to `http://localhost:3000` to interact with the application.
 
+## Deployment
+
+### 1. Database (Neon)
+- Create a serverless Postgres instance at [Neon.tech](https://neon.tech/).
+- Copy your connection string and add it to your `.env` or Vercel Environment Variables as `DATABASE_URL`.
+
+### 2. Redis (Upstash)
+- Create a free Redis database at [Upstash](https://upstash.com/).
+- Use the provided Redis URL for `REDIS_URL`.
+
+### 3. Automated Scraping (GitHub Actions)
+The project includes a GitHub Action in `.github/workflows/scrape.yml` that runs the scraper every 6 hours.
+To enable it:
+1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**.
+2. Add the following **Secrets**:
+    - `DATABASE_URL`: Your Neon connection string.
+    - `REDIS_URL`: Your Upstash Redis URL.
+3. The scraper will now run automatically. You can also trigger it manually from the **Actions** tab.
+
 ## Legal & Compliance
 
 This software integrates data scraping functionality. Please ensure all data scraping operations strictly comply with the Terms of Service of the targeted portals and all local data privacy regulations (e.g. GDPR). This platform is intended as an analytical aggregator—always conduct your own legal due diligence on Article 4 boundary mappings before executing contracts.

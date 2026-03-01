@@ -6,8 +6,8 @@
  * Run: npx tsx scrape-all-live.ts
  */
 import { chromium } from 'playwright-core';
-import { db } from './src/libs/database/db.js';
-import { properties } from './src/libs/database/schema.js';
+import { db } from '../src/libs/database/db.js';
+import { properties } from '../src/libs/database/schema.js';
 import { sql } from 'drizzle-orm';
 
 const CITIES = [

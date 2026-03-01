@@ -49,16 +49,17 @@ yarn-error.log*
 !CLAUDE.md
 
 # Testing, Debugging & Root Scripts
-test_*.ts
-check*.ts
-debug*.ts
-run_*.ts
-scrape-*.ts
-seed*.ts
-fix-*.ts
-auto-refresh.ts
-migrate-status.ts
-errors.txt
+scripts/test_*.ts
+scripts/check*.ts
+scripts/debug*.ts
+scripts/run_*.ts
+# scripts/scrape-*.ts (Keep scraper in repo for GitHub Actions)
+# scripts/scrape-*.ts
+scripts/seed*.ts
+scripts/fix-*.ts
+scripts/auto-refresh.ts
+scripts/migrate-status.ts
+scripts/errors.txt
 
 # Database 
 *.db
