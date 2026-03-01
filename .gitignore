@@ -56,6 +56,7 @@ scripts/run_*.ts
 # scripts/scrape-*.ts (Keep scraper in repo for GitHub Actions)
 # scripts/scrape-*.ts
 scripts/seed*.ts
+!scripts/seed-airbnb-demand.ts
 scripts/fix-*.ts
 scripts/auto-refresh.ts
 scripts/migrate-status.ts
