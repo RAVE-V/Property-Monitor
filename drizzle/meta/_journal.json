@@ -36,6 +36,13 @@
       "when": 1772385232748,
       "tag": "0004_soft_johnny_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1772400226597,
+      "tag": "0005_spotty_rocket_raccoon",
+      "breakpoints": true
     }
   ]
 }

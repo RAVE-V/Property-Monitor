@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
 import Map from './components/Map';
 import SidePanel from './components/SidePanel';
 import Filters from './components/Filters';
@@ -22,6 +23,8 @@ export default function Home() {
   const isListViewOpen = useAppStore(state => state.isListViewOpen);
   const toggleListView = useAppStore(state => state.toggleListView);
   const setListViewOpen = useAppStore(state => state.setListViewOpen);
+
+  const { data: session } = useSession();
   const filters = useAppStore(state => state.filters);
   const setFilters = useAppStore(state => state.setFilters);
   const setProperties = useAppStore(state => state.setProperties);
@@ -203,6 +206,31 @@ export default function Home() {
             </button>
             <Link href="/pipeline" className="text-[9px] font-black text-gray-400 hover:text-white transition-colors uppercase tracking-widest bg-[#111] border border-[#333] px-3 py-1 hover:border-gray-500">Satellite Dashboard</Link>
           </nav>
+
+          {/* User Avatar + Sign Out */}
+          {session?.user && (
+            <div className="flex items-center gap-2 pl-3 border-l border-[#222]">
+              {session.user.image ? (
+                <img
+                  src={session.user.image}
+                  alt={session.user.name || 'User'}
+                  className="w-6 h-6 rounded-full border border-[#333] object-cover"
+                  title={session.user.name || session.user.email || ''}
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-[#222] border border-[#333] flex items-center justify-center text-[9px] font-black text-gray-400">
+                  {(session.user.name?.[0] || session.user.email?.[0] || '?').toUpperCase()}
+                </div>
+              )}
+              <button
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                className="text-[9px] font-black text-gray-500 hover:text-red-400 transition-colors uppercase tracking-widest"
+                title="Sign out"
+              >
+                Exit
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
