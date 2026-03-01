@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '../../../libs/database/db.js';
+import { properties } from '../../../libs/database/schema.js';
+import { eq } from 'drizzle-orm';
 
-// Simple in-memory cache to avoid repeated LLM calls for same property
+// Simple in-memory cache to avoid repeated LLM calls for same property (fast-path)
 const verdictCache = new Map<string, string>();
 
 export async function POST(req: NextRequest) {
@@ -13,9 +16,31 @@ export async function POST(req: NextRequest) {
             roiPercentage, breakEvenADR
         } = body;
 
-        // Return cached verdict if available
+        // Layer 1: Check in-memory fast-path cache
         if (id && verdictCache.has(id)) {
             return NextResponse.json({ verdict: verdictCache.get(id) });
+        }
+
+        // Layer 2: Check persistent database cache
+        if (id) {
+            try {
+                const existing = await db.select({
+                    aiVerdict: properties.aiVerdict,
+                    aiVerdictUpdatedAt: properties.aiVerdictUpdatedAt
+                })
+                    .from(properties)
+                    .where(eq(properties.id, id))
+                    .limit(1);
+
+                if (existing[0]?.aiVerdict) {
+                    // Cache in memory for next time
+                    verdictCache.set(id, existing[0].aiVerdict);
+                    return NextResponse.json({ verdict: existing[0].aiVerdict });
+                }
+            } catch (dbErr) {
+                console.error('Database read error in AI verdict:', dbErr);
+                // Continue to LLM call if DB fails
+            }
         }
 
         const apiKey = process.env.GROQ_API_KEY;
@@ -75,13 +100,24 @@ Give your expert verdict now:`;
         const data = await response.json() as any;
         const verdict = data.choices?.[0]?.message?.content?.trim() ?? null;
 
-        // Cache it
+        // Cache it in Memory and Database
         if (id && verdict) {
             verdictCache.set(id, verdict);
-            // Evict old entries if cache grows too large
             if (verdictCache.size > 500) {
                 const firstKey = verdictCache.keys().next().value;
                 if (firstKey) verdictCache.delete(firstKey);
+            }
+
+            // Persist to DB for all other users to benefit
+            try {
+                await db.update(properties)
+                    .set({
+                        aiVerdict: verdict,
+                        aiVerdictUpdatedAt: new Date()
+                    })
+                    .where(eq(properties.id, id));
+            } catch (e) {
+                console.error('Failed to persist AI verdict to DB:', e);
             }
         }
 

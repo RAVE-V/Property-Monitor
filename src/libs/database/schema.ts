@@ -28,6 +28,8 @@ export const properties = pgTable('properties', {
   source: text('source').default('unknown'),
   status: text('status').default('active'), // active | stale | sold
   tenure: text('tenure').default('rent'), // rent | sale
+  aiVerdict: text('ai_verdict'),
+  aiVerdictUpdatedAt: timestamp('ai_verdict_updated_at'),
 });
 
 export const demandPoints = pgTable('demand_points', {
