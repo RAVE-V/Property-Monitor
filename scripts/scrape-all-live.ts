@@ -54,6 +54,34 @@ function extractPostcode(text: string): string {
     return m ? m[1]!.trim().toUpperCase() : '';
 }
 
+/**
+ * Robustly extract a price from a price string and normalise to PCM.
+ * Handles:
+ *  - "£1,200 pcm" => 1200
+ *  - "£300 pw" => 1300 (×52/12)
+ *  - "£300 per week" => 1300
+ *  - "£1200" => 1200 (assumed pcm if >= 300, else treated as pw)
+ */
+function extractPCM(priceText: string, fullText = ''): number {
+    const combined = (priceText + ' ' + fullText).toLowerCase();
+    // Find all numbers in the price element text (avoid multi-digit codes)
+    const nums = priceText.replace(/,/g, '').match(/\d{2,6}/g)?.map(Number) ?? [];
+    if (!nums.length) return 0;
+
+    // Pick the most likely price: first number in the typical rent range (100-10000)
+    const rawPrice = nums.find(n => n >= 100 && n <= 10000) ?? nums[0] ?? 0;
+    if (!rawPrice) return 0;
+
+    const isPW = /\bpw\b|per\s*week|weekly/i.test(combined);
+    const isPCM = /\bpcm\b|per\s*month|monthly/i.test(combined);
+
+    if (isPW) return Math.round((rawPrice * 52) / 12);
+    if (isPCM) return rawPrice;
+    // Heuristic: weekly rents are usually < 700 in the UK
+    if (rawPrice < 700 && !isPCM) return Math.round((rawPrice * 52) / 12);
+    return rawPrice;
+}
+
 // ─── OpenRent ─────────────────────────────────────────────────────────────────
 async function scrapeOpenRentCity(city: string, defaultLng: number, defaultLat: number): Promise<Listing[]> {
     const browser = await chromium.launch({ headless: true });
@@ -86,7 +114,7 @@ async function scrapeOpenRentCity(city: string, defaultLng: number, defaultLat: 
         });
 
         for (const item of raw.slice(0, 40)) {
-            const price = parseInt(item.priceText.replace(/[^0-9]/g, '')) || 0;
+            const price = extractPCM(item.priceText, item.innerText);
             if (!price) continue;
             const lines = item.innerText.split('\n').map((l: string) => l.trim()).filter(Boolean);
             let title = '';
@@ -154,7 +182,7 @@ async function scrapeOTMCity(city: string, defaultLng: number, defaultLat: numbe
         console.log(`  [OnTheMarket] ${city}: ${raw.length} raw cards`);
 
         for (const item of raw.slice(0, 30)) {
-            const price = parseInt(item.priceText.replace(/[^0-9]/g, '')) || 0;
+            const price = extractPCM(item.priceText, item.innerText);
             if (!price || !item.title) continue;
             const postcode = extractPostcode(item.title + ' ' + item.innerText);
             const bedMatch = (item.bedsText + item.title).match(/(\d+)\s*[Bb]ed/);
@@ -212,11 +240,8 @@ async function scrapeSpareRoomCity(city: string, defaultLng: number, defaultLat:
 
         for (const item of raw.slice(0, 30)) {
             if (!item.id || !item.priceText) continue;
-            // SpareRoom prices are often pw — normalise to pcm
-            const isPW = item.priceText.toLowerCase().includes('pw') || item.innerText.toLowerCase().includes('per week');
-            const rawPrice = parseInt(item.priceText.replace(/[^0-9]/g, '')) || 0;
-            if (!rawPrice) continue;
-            const price = isPW ? Math.round((rawPrice * 52) / 12) : rawPrice;
+            const price = extractPCM(item.priceText, item.innerText);
+            if (!price) continue;
             const postcode = extractPostcode(item.title + ' ' + item.innerText);
             let lat = defaultLat, lng = defaultLng;
             if (postcode) { const geo = await geocode(postcode); if (geo) { lat = geo.lat; lng = geo.lng; } }

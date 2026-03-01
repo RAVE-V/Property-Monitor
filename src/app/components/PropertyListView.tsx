@@ -173,30 +173,6 @@ export default function PropertyListView() {
             {filteredData.length} visible ({visibleProperties.length} total)
           </span>
         </div>
-
-        {/* Quick Filters */}
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-[8px] font-black uppercase text-gray-500 tracking-widest">Min Occupancy:</span>
-            <input
-              type="range" min="0" max="90" step="10"
-              value={minOccupancyFilter}
-              onChange={e => setMinOccupancyFilter(Number(e.target.value))}
-              className="w-20 accent-brand-cyan"
-            />
-            <span className="text-[10px] font-mono text-gray-300 w-8">{minOccupancyFilter > 0 ? `${minOccupancyFilter}%` : 'Any'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[8px] font-black uppercase text-gray-500 tracking-widest">Min Profit:</span>
-            <input
-              type="range" min="0" max="2500" step="250"
-              value={minProfitFilter}
-              onChange={e => setMinProfitFilter(Number(e.target.value))}
-              className="w-20 accent-brand-cyan"
-            />
-            <span className="text-[10px] font-mono text-gray-300 w-12">{minProfitFilter > 0 ? `£${minProfitFilter}` : 'Any'}</span>
-          </div>
-        </div>
       </div>
 
       <div className="flex-1 overflow-auto scrollbar-hide">

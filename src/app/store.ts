@@ -62,9 +62,9 @@ export const useAppStore = create<AppState>((set) => ({
     filters: typeof filters === 'function' ? filters(state.filters) : filters
   })),
 
-  minOccupancyFilter: 60,
+  minOccupancyFilter: 0,
   setMinOccupancyFilter: (val) => set({ minOccupancyFilter: val }),
 
-  minProfitFilter: 500,
+  minProfitFilter: 0,
   setMinProfitFilter: (val) => set({ minProfitFilter: val })
 }));

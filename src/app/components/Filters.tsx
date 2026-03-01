@@ -1,10 +1,16 @@
 import React from 'react';
+import { useAppStore } from '../store';
 
 interface FilterProps {
   onFilterChange: (filters: any) => void;
 }
 
 const Filters: React.FC<FilterProps> = ({ onFilterChange }) => {
+  const minOccupancyFilter = useAppStore(state => state.minOccupancyFilter);
+  const setMinOccupancyFilter = useAppStore(state => state.setMinOccupancyFilter);
+  const minProfitFilter = useAppStore(state => state.minProfitFilter);
+  const setMinProfitFilter = useAppStore(state => state.setMinProfitFilter);
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     onFilterChange((prev: any) => ({ ...prev, [name]: value }));
@@ -66,6 +72,30 @@ const Filters: React.FC<FilterProps> = ({ onFilterChange }) => {
           onChange={(e) => onFilterChange((prev: any) => ({ ...prev, isTiredLandlord: e.target.checked }))}
           className="w-3.5 h-3.5 rounded-none border-[#333] bg-[#111] text-brand-gold focus:ring-brand-gold cursor-pointer"
         />
+      </div>
+      {/* Separator */}
+      <div className="w-px h-4 bg-[#333] mx-1" />
+      {/* Occupancy Slider */}
+      <div className="flex items-center gap-2">
+        <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Min Occ</label>
+        <input
+          type="range" min="0" max="90" step="10"
+          value={minOccupancyFilter}
+          onChange={e => setMinOccupancyFilter(Number(e.target.value))}
+          className="w-16 accent-brand-cyan"
+        />
+        <span className="text-[10px] font-mono text-gray-300 w-8">{minOccupancyFilter > 0 ? `${minOccupancyFilter}%` : 'Any'}</span>
+      </div>
+      {/* Profit Slider */}
+      <div className="flex items-center gap-2">
+        <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Min Profit</label>
+        <input
+          type="range" min="0" max="2500" step="250"
+          value={minProfitFilter}
+          onChange={e => setMinProfitFilter(Number(e.target.value))}
+          className="w-16 accent-brand-cyan"
+        />
+        <span className="text-[10px] font-mono text-gray-300 w-12">{minProfitFilter > 0 ? `£${minProfitFilter}` : 'Any'}</span>
       </div>
     </div>
   );
