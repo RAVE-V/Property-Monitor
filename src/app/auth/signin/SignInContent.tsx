@@ -110,7 +110,7 @@ export default function SignInContent() {
                         </button>
 
                         <button
-                            onClick={() => signIn('credentials', { callbackUrl })}
+                            onClick={() => signIn('credentials', { callbackUrl, bypass: 'true' })}
                             className="group flex items-center gap-3 w-full bg-[#111] hover:bg-[#161616] border border-[#222] hover:border-[#444] px-4 py-3 transition-all duration-200"
                         >
                             <svg className="w-4 h-4 flex-shrink-0 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -23,10 +23,13 @@ const config = {
         Google({
             clientId: process.env.AUTH_GOOGLE_ID || 'dummy_client_id',
             clientSecret: process.env.AUTH_GOOGLE_SECRET || 'dummy_client_secret',
+            allowDangerousEmailAccountLinking: true,
         }),
         Credentials({
             name: 'Development Mode',
-            credentials: {},
+            credentials: {
+                bypass: { label: 'Bypass', type: 'text' }
+            },
             async authorize() {
                 return { id: 'dev-admin', name: 'Admin', email: 'admin@propertyintel.com' };
             }
@@ -39,8 +42,10 @@ const config = {
         signIn: '/auth/signin',
         error: '/auth/signin',
     },
+    debug: true,
     callbacks: {
         async signIn({ user, profile, account, email, credentials }) {
+            console.log(`[NextAuth] signIn triggered for ${user?.email} via ${account?.provider}`);
             // Update last IP address on sign in if we have a user ID and can find the IP
             if (user?.id) {
                 try {
