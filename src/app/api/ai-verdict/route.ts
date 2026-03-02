@@ -39,12 +39,12 @@ async function fetchDescription(url: string): Promise<string | null> {
             // Strip HTML tags, decode entities, trim
             const text = match[1]!
                 .replace(/<[^>]+>/g, ' ')
-                .replace(/&amp;/g, '&')
                 .replace(/&lt;/g, '<')
                 .replace(/&gt;/g, '>')
                 .replace(/&nbsp;/g, ' ')
                 .replace(/&#39;/g, "'")
                 .replace(/&quot;/g, '"')
+                .replace(/&amp;/g, '&')
                 .replace(/\s+/g, ' ')
                 .trim();
             return text.slice(0, 2000); // Cap at 2000 chars to keep prompt focused
