@@ -7,6 +7,36 @@ import { eq } from 'drizzle-orm';
 const verdictCache = new Map<string, string>();
 
 /**
+ * Validate that a listing URL is safe and points to a known property portal.
+ * This prevents arbitrary SSRF to internal or unexpected external services.
+ */
+function isAllowedListingUrl(urlStr: string): boolean {
+    try {
+        const parsed = new URL(urlStr);
+
+        // Only allow HTTP(S) schemes
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            return false;
+        }
+
+        // Allow-list of known listing portals
+        const allowedHosts = new Set<string>([
+            'www.openrent.co.uk',
+            'openrent.co.uk',
+            'www.spareroom.co.uk',
+            'spareroom.co.uk',
+            'www.onthemarket.com',
+            'onthemarket.com',
+        ]);
+
+        return allowedHosts.has(parsed.hostname.toLowerCase());
+    } catch {
+        // Invalid URL
+        return false;
+    }
+}
+
+/**
  * Fetch the full listing description from the portal URL.
  * Works for OpenRent, SpareRoom, and OnTheMarket.
  * Returns a trimmed description string or null.
@@ -97,7 +127,7 @@ export async function POST(req: NextRequest) {
 
         // Fetch the full listing description from the portal URL
         let description: string | null = null;
-        if (url) {
+        if (url && isAllowedListingUrl(url)) {
             description = await fetchDescription(url);
             // Persist description to DB for future use
             if (description && id) {
