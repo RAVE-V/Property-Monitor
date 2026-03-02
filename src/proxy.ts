@@ -1,8 +1,10 @@
 import { auth } from './libs/auth';
 
+import type { NextRequest } from 'next/server';
+
 // Use the native Auth.js edge-compatible middleware
 // https://authjs.dev/getting-started/migrating-to-v5#edge-compatibility
-export default auth((req) => {
+const middleware = auth((req) => {
     // If we want custom redirect logic, we can put it here inside the auth callback
     const { nextUrl } = req;
     const isAuthenticated = !!req.auth;
@@ -26,6 +28,10 @@ export default auth((req) => {
         return Response.redirect(redirectUrl);
     }
 });
+
+export default function proxy(request: NextRequest) {
+    return (middleware as any)(request);
+}
 
 // Define the paths where the middleware should run
 export const config = {
